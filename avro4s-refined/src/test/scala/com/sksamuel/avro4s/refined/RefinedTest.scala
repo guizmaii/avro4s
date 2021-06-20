@@ -11,6 +11,7 @@ import eu.timepit.refined.types.string.NonEmptyString
 import eu.timepit.refined.types.numeric.NonNegInt
 
 case class Foo(nonEmptyStr: String Refined NonEmpty)
+case class Bar(value: NonEmptyString = "Babar")
 case class FooMap(nonEmptyStrKeyMap: Map[NonEmptyString, NonNegInt])
 
 class RefinedTest extends AnyWordSpec with Matchers {
@@ -26,6 +27,22 @@ class RefinedTest extends AnyWordSpec with Matchers {
           |	"fields": [{
           |		"name": "nonEmptyStr",
           |		"type": "string"
+          |	}]
+          |}
+        """.stripMargin)
+    }
+
+    "accept default value" in {
+      AvroSchema[Bar] shouldBe new Schema.Parser().parse(
+        """
+          |{
+          |	"type": "record",
+          |	"name": "Bar",
+          |	"namespace": "com.sksamuel.avro4s.refined",
+          |	"fields": [{
+          |		"name": "value",
+          |		"type": "string",
+          |   "default": "Babar"
           |	}]
           |}
         """.stripMargin)
