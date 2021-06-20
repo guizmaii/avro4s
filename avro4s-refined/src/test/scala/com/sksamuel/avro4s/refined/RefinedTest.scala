@@ -4,11 +4,12 @@ import com.sksamuel.avro4s._
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.auto._
 import eu.timepit.refined.collection.NonEmpty
+import eu.timepit.refined.types.numeric.NonNegInt
+import eu.timepit.refined.types.string.NonEmptyString
+import io.estatico.newtype.macros.newtype
 import org.apache.avro.Schema
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import eu.timepit.refined.types.string.NonEmptyString
-import eu.timepit.refined.types.numeric.NonNegInt
 
 case class Foo(nonEmptyStr: String Refined NonEmpty)
 case class FooMap(nonEmptyStrKeyMap: Map[NonEmptyString, NonNegInt])
@@ -37,6 +38,21 @@ class RefinedTest extends AnyWordSpec with Matchers {
 
       schema.getField("map").schema().getType shouldBe Schema.Type.MAP
       schema.getField("nonEmptyStr").schema().getType shouldBe Schema.Type.STRING
+    }
+
+    "Combined with newtypes" should {
+      "just be the underlying type" in {
+        object types {
+          import scala.language.implicitConversions
+
+          @newtype final case class Bar(nonEmptyStr: NonEmptyString)
+          object Bar {
+            implicit final val schema: SchemaFor[Bar] = SchemaFor[NonEmptyString].forType[Bar]
+          }
+        }
+
+        AvroSchema[types.Bar] shouldBe AvroSchema[String]
+      }
     }
   }
 

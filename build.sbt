@@ -54,8 +54,10 @@ val `avro4s-kafka` = project.in(file("avro4s-kafka"))
 val `avro4s-refined` = project.in(file("avro4s-refined"))
   .dependsOn(`avro4s-core` % "compile->compile;test->test")
   .settings(
+    scalacOptions += "-Ymacro-annotations",
     libraryDependencies ++= Seq(
-      "eu.timepit" %% "refined" % RefinedVersion
+      "eu.timepit" %% "refined" % RefinedVersion,
+      "io.estatico" %% "newtype" % "0.4.4" % Test
     )
   )
 
