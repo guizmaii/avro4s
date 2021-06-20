@@ -3,12 +3,13 @@ package com.sksamuel.avro4s
 import java.nio.ByteBuffer
 import java.time.Instant
 import java.util.UUID
-
 import org.apache.avro.LogicalTypes.Decimal
 import org.apache.avro.generic.{GenericEnumSymbol, GenericFixed}
 import org.apache.avro.util.Utf8
 import org.apache.avro.{Conversions, Schema}
 import CustomDefaults._
+import eu.timepit.refined.api.Refined
+
 import scala.collection.JavaConverters._
 
 /**
@@ -40,14 +41,14 @@ object DefaultResolver {
     case x: scala.Int => java.lang.Integer.valueOf(x)
     case x: scala.Double => java.lang.Double.valueOf(x)
     case x: scala.Float => java.lang.Float.valueOf(x)
+    case x: Refined[_, _] => apply(x.value, schema)
     case x: Map[_,_] => x.asJava
     case x: Seq[_] => x.asJava
     case x: Set[_] => x.asJava
     case shapeless.Inl(x) => apply(x, schema)
     case p: Product => customDefault(p, schema)
     case v if isScalaEnumeration(v) => customScalaEnumDefault(value)
-    case _ =>
-      value.asInstanceOf[AnyRef]
+    case _ => value.asInstanceOf[AnyRef]
   }
 
 }
