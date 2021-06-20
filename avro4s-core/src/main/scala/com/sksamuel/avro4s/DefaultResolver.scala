@@ -10,6 +10,7 @@ import org.apache.avro.{Conversions, Schema}
 import CustomDefaults._
 import eu.timepit.refined.api.Refined
 
+import java.lang.reflect.Field
 import scala.collection.JavaConverters._
 
 /**
@@ -41,7 +42,12 @@ object DefaultResolver {
     case x: scala.Int => java.lang.Integer.valueOf(x)
     case x: scala.Double => java.lang.Double.valueOf(x)
     case x: scala.Float => java.lang.Float.valueOf(x)
-    case x: Refined[_, _] => apply(x.value, schema)
+    case x if x.getClass.getSimpleName.contains("Refined") => {
+      val valueField: Field = x.getClass.getDeclaredField("value")
+      valueField.setAccessible(true)
+      val value = valueField.get(x)
+      apply(value, schema)
+    }
     case x: Map[_,_] => x.asJava
     case x: Seq[_] => x.asJava
     case x: Set[_] => x.asJava

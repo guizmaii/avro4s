@@ -24,7 +24,6 @@ val `avro4s-core` = project.in(file("avro4s-core"))
       "com.propensive" %% "magnolia" % MagnoliaVersion,
       "com.chuusai" %% "shapeless" % ShapelessVersion,
       "org.json4s" %% "json4s-native" % Json4sVersion,
-      "eu.timepit" %% "refined" % RefinedVersion
     )
   )
 
